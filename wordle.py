@@ -1,4 +1,7 @@
 import random
+from collections import Counter
+from colorama import Back,Style,init
+init()
 
 WORD_LIST = [
     # 과일·채소·동물·추상어 혼합, 최대 8글자 단어 100개
@@ -29,38 +32,70 @@ WORD_LIST = [
 ]
 
 re = 0
+tries = 0
+Max_tries = 5
 
 word = random.choice(WORD_LIST)
-print(word) #지울거
+print(word)
+print('Guess The Word', '\n')
 
 question = list(word)
 count = len(question) #문제 단어 글자 개수 + 배열화
 
 for j in range(count):
     print("_", end=" ")  # 밑줄 출력
+print('\n', count,'글자', '\n')
 
-for i in range(5): #반복 횟수
+while tries < Max_tries: #반복 횟수(기회 5번)
 
-    print("\n")
-
-    answer = input(f"Your Answer {i+1} (in capital) : ")#답변
+    answer = input(f"Your Answer {tries+1} (in capital) : ")#답변
+    print('\n')
 
     answer_count = len(answer)
     answer_letter = list(answer)
 
     if answer_count != count:
-        print("Try Again : ")
+        print("Try Again")
+        continue #글자수 맞지 않으면 다시
 
-    result = [x if x == y else '_' for x, y in zip(question, answer_letter)]
-    check = ' '.join(result)
+    tries += 1
+
+    def color_compare(question, answer_letter):
+      remaining = Counter(question)
+      result = [None] * len(question)
+
+      # 1) 초록 처리 (위치+글자 일치)
+      for i, (q, a) in enumerate(zip(question, answer_letter)):
+        if a == q:
+          result[i] = Back.GREEN + a + Style.RESET_ALL
+          remaining[a] -= 1
+
+      # 2) 노랑·빨강 처리 (나머지)
+      for i, a in enumerate(answer_letter):
+        if result[i] is not None:
+          continue
+        if remaining[a] > 0:
+          result[i] = Back.YELLOW + a + Style.RESET_ALL
+          remaining[a] -= 1
+        else:
+          result[i] = Back.RED + '_' + Style.RESET_ALL
+
+      return result #글자위치, 종류 맞으면 초록색 하나라도 틀리면 빨간색
+
+    result = color_compare(question, answer_letter)
+    check = ''.join(result)
+
     print(check)
+    print("\n")
 
     if answer_letter == question:
         re = 1
-        break
+        break #루프 종료
 
 if re == 0:
     print("실패!!")
+    print('정답은', word)
 
 if re == 1:
     print("정답!!")
+
