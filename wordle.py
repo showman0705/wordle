@@ -1,6 +1,10 @@
 import random
+import test
 from collections import Counter
 from colorama import Back,Style,init
+
+from test import GREEN
+
 init()
 
 WORD_LIST = [
@@ -34,6 +38,7 @@ WORD_LIST = [
 re = 0
 tries = 0
 Max_tries = 5
+
 
 word = random.choice(WORD_LIST)
 print(word)
